@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Valid.Biometric.FindFingerprintYoloTinyV4\Valid.Biometric.FindFingerprintYoloTinyV4.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+
 </Project>
