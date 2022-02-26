@@ -48,12 +48,6 @@ namespace ConsoleApplicationAppTest
                 System.IO.File.WriteAllBytes("C:\\temp\\digital6.bmp", fingerprintFound);
             });
             lstTask.Add(task6);
-            Task task7 = Task.Run(() =>
-            {
-                byte[] fingerprintFound = yoloWrapper.DetectFingerprint(System.IO.File.ReadAllBytes(@"C:\Temp\Log\digital_8656852_7.bmp"));
-                System.IO.File.WriteAllBytes("C:\\temp\\digital7.bmp", fingerprintFound);
-            });
-            lstTask.Add(task7);
             Task.WaitAll(lstTask.ToArray());
         }
     }

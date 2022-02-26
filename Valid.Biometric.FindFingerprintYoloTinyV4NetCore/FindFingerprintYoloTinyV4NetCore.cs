@@ -3,6 +3,7 @@ using Alturos.Yolo.Model;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -402,15 +403,18 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4NetCore
             MemoryStream ms = new MemoryStream(image);
             Bitmap src = new Bitmap(ms);
             Rectangle cropRect = new Rectangle(topYoloItem.X, topYoloItem.Y, topYoloItem.Width, topYoloItem.Height);
-            Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
-            using (Graphics g = Graphics.FromImage(target))
+            Bitmap targetBeforeResizing = new Bitmap(cropRect.Width, cropRect.Height);
+            using (Graphics g = Graphics.FromImage(targetBeforeResizing))
             {
-                g.DrawImage(src, new Rectangle(0, 0, target.Width, target.Height),
+                g.DrawImage(src, new Rectangle(0, 0, targetBeforeResizing.Width, targetBeforeResizing.Height),
                                  cropRect,
                                  GraphicsUnit.Pixel);
             }
 
-            target.SetResolution(500, 500);
+            targetBeforeResizing.SetResolution(500, 500);
+
+            //Converter para 512x512
+            Bitmap target = IncreaseSizeWithoutResizing(targetBeforeResizing, 512, 512);
 
             ImageConverter converter = new ImageConverter();
             imageRet = (byte[])converter.ConvertTo(target, typeof(byte[]));
@@ -428,6 +432,12 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4NetCore
                 src = null;
             }
 
+            if (targetBeforeResizing != null)
+            {
+                targetBeforeResizing.Dispose();
+                targetBeforeResizing = null;
+            }
+
             if (target != null)
             {
                 target.Dispose();
@@ -441,6 +451,27 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4NetCore
             #endregion
 
             return imageRet;
+        }
+        private Bitmap IncreaseSizeWithoutResizing(Image image, int width, int height)
+        {
+            try
+            {
+                Bitmap newImage = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+                using (Graphics graphicsHandle = Graphics.FromImage(newImage))
+                {
+                    // Calculate x and y which center the image
+                    int y = (height - image.Height) / 2;
+                    int x = (width - image.Width) / 2;
+                    graphicsHandle.Clear(Color.White);
+                    graphicsHandle.DrawImage(image, x, y, image.Width, image.Height);
+                }
+                newImage.SetResolution(500, 500);
+                return newImage;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
