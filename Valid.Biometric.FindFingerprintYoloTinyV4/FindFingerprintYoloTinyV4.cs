@@ -270,7 +270,7 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
         /// <returns></returns>
         /// <exception cref="NotImplementedException">Thrown when the yolo_cpp dll is wrong compiled</exception>
         /// <exception cref="Exception">Thrown when the byte array is not a valid image</exception>
-        public byte[] DetectFingerprint(byte[] imageData)
+        public byte[] DetectFingerprint(byte[] imageData, System.Drawing.Imaging.ImageFormat imageFormat)
         {
             lock(mutex)
             {
@@ -313,7 +313,7 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
                     throw new NotImplementedException("C++ dll compiled incorrectly");
                 }
 
-                return GetAndCropImage(imageData, this.Convert(container));
+                return GetAndCropImage(imageData, this.Convert(container), imageFormat);
             }
         }
 
@@ -393,7 +393,7 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
             );
         }
 
-        private byte[] GetAndCropImage(byte[] image, IEnumerable<YoloItem> yoloItems)
+        private byte[] GetAndCropImage(byte[] image, IEnumerable<YoloItem> yoloItems, System.Drawing.Imaging.ImageFormat imageFormat)
         {
             byte[] imageRet = null;
 
@@ -416,9 +416,16 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
 
             //Converter para 512x512
             Bitmap target = IncreaseSizeWithoutResizing(targetBeforeResizing, 512, 512);
-
             ImageConverter converter = new ImageConverter();
-            imageRet = (byte[])converter.ConvertTo(target, typeof(byte[]));
+
+            using (MemoryStream msConversion = new MemoryStream())
+            {
+                target.Save(msConversion, imageFormat);
+                using (Bitmap bmpConversion = new Bitmap(msConversion))
+                {
+                    imageRet = (byte[])converter.ConvertTo(bmpConversion, typeof(byte[]));
+                }
+            }
 
             #region "DISPOSES"
             if (ms != null)
