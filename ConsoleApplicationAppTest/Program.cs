@@ -11,10 +11,12 @@ namespace ConsoleApplicationAppTest
         {
             var yoloWrapper = new FindFingerprintYoloTinyV4("yolov4-tiny-digitais_sid.cfg", "yolov4-tiny-digitais_sid_final.weights", "digital_sid.names");
 
+            var yoloWrapper2 = new FindFingerprintYoloTinyV4("yolov4-tiny-digitais_sid.cfg", "yolov4-tiny-digitais_sid_final.weights", "digital_sid.names");
+
             List<Task> lstTask = new List<Task>();
             Task task1 = Task.Run(() =>
             {
-                byte[] fingerprintFound = yoloWrapper.DetectFingerprint(System.IO.File.ReadAllBytes(@"C:\Temp\Log\digital_8656852_1.bmp"),System.Drawing.Imaging.ImageFormat.Jpeg);
+                byte[] fingerprintFound = yoloWrapper2.DetectFingerprint(System.IO.File.ReadAllBytes(@"C:\Temp\Log\digital_8656852_1.bmp"),System.Drawing.Imaging.ImageFormat.Jpeg);
                 System.IO.File.WriteAllBytes("C:\\temp\\digital1.jpg", fingerprintFound);
             });
             lstTask.Add(task1);

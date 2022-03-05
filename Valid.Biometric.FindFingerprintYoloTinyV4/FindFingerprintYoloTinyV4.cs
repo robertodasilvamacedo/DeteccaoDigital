@@ -101,7 +101,7 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
             {
                 this._yoloSystemValidator = new DefaultYoloSystemValidator();
             }
-            if(mutex == null)
+            if (mutex == null)
             {
                 mutex = new object();
             }
@@ -178,10 +178,11 @@ namespace Valid.Biometric.FindFingerprintYoloTinyV4
                         InitializeYoloGpu(configurationFilename, weightsFilename, gpuConfig.GpuIndex);
                         break;
                 }
-
-                this._objectTypeResolver = new YoloObjectTypeResolver(namesFilename);
                 isModelLoaded = true;
             }
+
+            this.DetectionSystem = DetectionSystem.CPU;
+            this._objectTypeResolver = new YoloObjectTypeResolver(namesFilename);
         }
 
         /// <summary>
